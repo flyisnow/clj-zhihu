@@ -70,3 +70,13 @@
   (binding [clj-http.core/*cookie-store* cookie-store]
     (= 200 (:status (client/get "http://www.zhihu.com/settings/profile"
                                 {:max-redirects 0})))))
+
+(defmacro with-zhihu-account
+  "use a zhihu account for following actions
+  usage:
+  (with-zhihu-account [username password]
+    actions)"
+  [bindings & body]
+  `(binding [clj-http.core/*cookie-store*
+             (apply login ~bindings)]
+     ~@body))
