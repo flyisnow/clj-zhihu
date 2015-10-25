@@ -1,16 +1,21 @@
 (ns clj-zhihu.core
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [seesaw.core :as ss]))
+            [seesaw.core :as ss])
+  (:import [org.apache.commons.io IOUtils]))
 
 (defn ^:private show-image
   "show an image in a JFrame"
   [image-path]
-  (->
-   (ss/frame :title "Captcha"
-             :content (ss/label :icon (seesaw.icon/icon (io/resource image-path))))
-   ss/pack!
-   ss/show!))
+  (with-open [captcha-stream (io/input-stream (io/resource image-path))]
+    (let [captcha-bytearray (IOUtils/toByteArray captcha-stream)]
+      (->
+       (ss/frame :title "Captcha"
+                 :content (ss/label :icon (seesaw.icon/icon
+                                           (javax.swing.ImageIcon. captcha-bytearray))))
+       ss/pack!
+       ss/show!))))
+
 
 (defn ^:private get-xsrf
   "get the xsrf value given an html page"
@@ -28,14 +33,12 @@
   []
   (let [captcha-url   "http://www.zhihu.com/captcha.gif"
         download-path "captcha.gif"
-        _ (with-open [f (io/output-stream (io/resource download-path))]
+        _ (with-open [f (io/output-stream (io/file "resources" download-path))]
             (.write f (:body (client/get captcha-url {:as :byte-array}))))
         image-frame (show-image download-path)]
-    (try
-      (prn "please input the captcha")
-      (read-line)
-      (finally
-        (ss/dispose! image-frame)))))
+    (try (prn "please input the captcha")
+         (read-line)
+         (finally (ss/dispose! image-frame)))))
 
 (defn log-in
   "log in zhihu and return the cookie store"
@@ -47,11 +50,11 @@
             login-page-source (:body (client/get login-page-url))
             captcha           (get-captcha)
             xsrf              (get-xsrf login-page-source)]
-        (client/post form-submit-url
-                     {:form-params
-                      {:email user
-                       :password pass
-                       :remember_me true
-                       :_xsrf xsrf
-                       :captcha captcha}})))
+        (prn (client/post form-submit-url
+                          {:form-params
+                           {:email user
+                            :password pass
+                            :remember_me true
+                            :_xsrf xsrf
+                            :captcha captcha}}))))
     cookie-store))
