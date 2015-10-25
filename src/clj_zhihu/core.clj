@@ -2,7 +2,8 @@
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
             [seesaw.core :as ss]
-            [clojure.data.json :as json])
+            [clojure.data.json :as json]
+            [taoensso.nippy :as nippy])
   (:import [org.apache.commons.io IOUtils]))
 
 (defn ^:private show-image
@@ -41,7 +42,7 @@
          (read-line)
          (finally (ss/dispose! image-frame)))))
 
-(defn login
+(defn ^:private force-login
   "log in zhihu and return the cookie store"
   [user pass]
   (let [cookie-store (clj-http.cookies/cookie-store)]
@@ -64,12 +65,38 @@
           (throw (Exception. "login Failed")))))
     cookie-store))
 
+(defn login
+  "log into zhihu"
+  [user pass]
+  (let [cookie (read-cookie-store user)]
+    (if (or (nil? cookie)
+            (not (login? cookie)))
+      (write-cookie-store (force-login user pass))
+      (do (prn "login success")
+          cookie))))
+
 (defn login?
   "return true if logged in with a cookie store, otherwise false"
   [cookie-store]
   (binding [clj-http.core/*cookie-store* cookie-store]
     (= 200 (:status (client/get "http://www.zhihu.com/settings/profile"
                                 {:max-redirects 0})))))
+
+(defn write-cookie-store
+  "save cookie corresponding to a user"
+  [user cookie-store]
+  (with-open [f (io/output-stream (io/file "resources"
+                                           "cookies"
+                                           user))]
+    (.write f (nippy/freeze cookie-store)))
+  cookie-store)
+
+(defn read-cookie-store
+  "read cookie store given a user"
+  [user]
+  (if-let [cookie-file (io/resource (str "cookies/" user))]
+    (with-open [f (io/input-stream cookie-file)]
+      (nippy/thaw (IOUtils/toByteArray f)))))
 
 (defmacro with-zhihu-account
   "use a zhihu account for following actions
@@ -80,3 +107,5 @@
   `(binding [clj-http.core/*cookie-store*
              (apply login ~bindings)]
      ~@body))
+
+
