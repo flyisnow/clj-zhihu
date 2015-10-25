@@ -41,7 +41,7 @@
          (read-line)
          (finally (ss/dispose! image-frame)))))
 
-(defn log-in
+(defn login
   "log in zhihu and return the cookie store"
   [user pass]
   (let [cookie-store (clj-http.cookies/cookie-store)]
@@ -60,6 +60,13 @@
                                          :captcha captcha}}))
                    json/read-str
                    (get "r"))
-          0(prn "login success")
+          0 (prn "login success")
           (throw (Exception. "login Failed")))))
     cookie-store))
+
+(defn login?
+  "return true if logged in with a cookie store, otherwise false"
+  [cookie-store]
+  (binding [clj-http.core/*cookie-store* cookie-store]
+    (= 200 (:status (client/get "http://www.zhihu.com/settings/profile"
+                                {:max-redirects 0})))))
