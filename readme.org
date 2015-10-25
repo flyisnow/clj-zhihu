@@ -1,0 +1,19 @@
+* clj-zhihu
+
+A Clojure library designed to log into Zhihu, which is a Q&A website
+in China, and perform various actions.
+
+* Installation
+
+=clj-zhihu= will be available as a Maven artifact from Clojars.
+
+* Usage
+
+
+
+* License
+
+Copyright © 2015 FIXME
+
+Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.
