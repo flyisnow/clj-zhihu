@@ -1,7 +1,8 @@
 (ns clj-zhihu.core
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [seesaw.core :as ss])
+            [seesaw.core :as ss]
+            [clojure.data.json :as json])
   (:import [org.apache.commons.io IOUtils]))
 
 (defn ^:private show-image
@@ -50,11 +51,15 @@
             login-page-source (:body (client/get login-page-url))
             captcha           (get-captcha)
             xsrf              (get-xsrf login-page-source)]
-        (prn (client/post form-submit-url
-                          {:form-params
-                           {:email user
-                            :password pass
-                            :remember_me true
-                            :_xsrf xsrf
-                            :captcha captcha}}))))
+        (case  (-> (:body (client/post form-submit-url
+                                       {:form-params
+                                        {:email user
+                                         :password pass
+                                         :remember_me true
+                                         :_xsrf xsrf
+                                         :captcha captcha}}))
+                   json/read-str
+                   (get "r"))
+          0(prn "login success")
+          (throw (Exception. "login Failed")))))
     cookie-store))
