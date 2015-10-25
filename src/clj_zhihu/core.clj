@@ -65,6 +65,22 @@
           (throw (Exception. "login Failed")))))
     cookie-store))
 
+(defn ^:private write-cookie-store
+  "save cookie corresponding to a user"
+  [user cookie-store]
+  (with-open [f (io/output-stream (io/file "resources"
+                                           "cookies"
+                                           user))]
+    (.write f (nippy/freeze cookie-store)))
+  cookie-store)
+
+(defn ^:private read-cookie-store
+  "read cookie store given a user"
+  [user]
+  (if-let [cookie-file (io/resource (str "cookies/" user))]
+    (with-open [f (io/input-stream cookie-file)]
+      (nippy/thaw (IOUtils/toByteArray f)))))
+
 (defn login
   "log into zhihu"
   [user pass]
@@ -82,22 +98,6 @@
     (= 200 (:status (client/get "http://www.zhihu.com/settings/profile"
                                 {:max-redirects 0})))))
 
-(defn write-cookie-store
-  "save cookie corresponding to a user"
-  [user cookie-store]
-  (with-open [f (io/output-stream (io/file "resources"
-                                           "cookies"
-                                           user))]
-    (.write f (nippy/freeze cookie-store)))
-  cookie-store)
-
-(defn read-cookie-store
-  "read cookie store given a user"
-  [user]
-  (if-let [cookie-file (io/resource (str "cookies/" user))]
-    (with-open [f (io/input-stream cookie-file)]
-      (nippy/thaw (IOUtils/toByteArray f)))))
-
 (defmacro with-zhihu-account
   "use a zhihu account for following actions
   usage:
@@ -107,5 +107,3 @@
   `(binding [clj-http.core/*cookie-store*
              (apply login ~bindings)]
      ~@body))
-
-
