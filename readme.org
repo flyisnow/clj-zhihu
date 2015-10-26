@@ -13,12 +13,12 @@ in China, and perform various actions.
   (require '(clj-zhihu [auth :as auth] [core :as core]))
 
   (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu"] ;; Your email address and password here
-    (get-followee-num "meliorare") ;; the user's homepage id here
+    (core/get-followee-num "meliorare") ;; the user's homepage id here
     )
                                           ;= 67
 
   (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu"] ;; Your email address and password here
-    (get-followees "meliorare") ;; the user's homepage id here
+    (core/get-followees "meliorare") ;; the user's homepage id here
     ) ;; return a set of followees' homepage id
   ;; #{"shi-cheng-tuo" "123highsun" "CherrySu" "bearzx"
   ;;   "rongyijidewangzhi" "mao-bu-qun" "hua-yang-73" "ding-xiao-wen-18"
