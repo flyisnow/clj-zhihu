@@ -2,7 +2,8 @@
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
             [clojure.data.json :as json]
-            [net.cgrand.enlive-html :as html]))
+            [net.cgrand.enlive-html :as html])
+  (:use [clj-zhihu.utils]))
 
 (defn get-followee-num
   "get the number of followees"
