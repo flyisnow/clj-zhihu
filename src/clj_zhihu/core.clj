@@ -5,25 +5,9 @@
             [net.cgrand.enlive-html :as html])
   (:use [clj-zhihu.utils]))
 
-(defn get-followee-num
-  "get the number of followees"
-  [id]
-  (let [userurl (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl
-                     client/get
-                     :body)]
-    (-> (java.io.StringReader.  userpage)
-        html/html-resource
-        (html/select [:div.zm-profile-side-following.zg-clear])
-        (html/select [:strong])
-        first
-        :content
-        first
-        Integer/parseInt)))
-
-(defn get-followees
+(defn ^:private get-followees
   "get a set of followees' id given the id of a user"
-  [id]
+  [id followee#]
   (let [url      "http://www.zhihu.com/node/ProfileFolloweesListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
         userpage (-> userurl
@@ -42,27 +26,11 @@
                         (re-seq #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\"")
                         (map second)))
             #{}
-            (range 0 (Math/ceil (/ (get-followee-num id) 20))))))
+            (range 0 (Math/ceil (/ followee# 20))))))
 
-(defn get-follower-num
-  "given user id return the number of followers"
-  [id]
-  (let [userurl (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl
-                     client/get
-                     :body)]
-    (-> (java.io.StringReader.  userpage)
-        html/html-resource
-        (html/select  [:div.zm-profile-side-following.zg-clear])
-        (html/select [:strong])
-        second
-        :content
-        first
-        Integer/parseInt)))
-
-(defn get-followers
+(defn ^:private get-followers
   "given user id return a set of user id of the followers"
-  [id]
+  [id follower#]
   (let [url      "http://www.zhihu.com/node/ProfileFollowersListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
         userpage (-> userurl
@@ -81,10 +49,10 @@
                         (re-seq #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\"")
                         (map second)))
             #{}
-            (range 0 (Math/ceil (/ (get-follower-num id) 20))))))
+            (range 0 (Math/ceil (/ follower# 20))))))
 
-(defn get-profile
-  "given user id return a map of user's profile"
+(defn user
+  "given user id return a user map"
   [id]
   (let [userurl (str "http://www.zhihu.com/people/" id)
         userpage (-> userurl
@@ -93,7 +61,19 @@
         enlive-userpage (html/html-resource (java.io.StringReader. userpage))
         enlive-navbarnode (html/select enlive-userpage [:div.profile-navbar.clearfix])
         navbar-numbers (map (comp #(Integer/parseInt %) first :content)
-                            (html/select enlive-navbarnode [:span.num]))]
+                            (html/select enlive-navbarnode [:span.num]))
+        followee# (-> (html/select enlive-userpage [:div.zm-profile-side-following.zg-clear])
+                      (html/select [:strong])
+                      first
+                      :content
+                      first
+                      Integer/parseInt)
+        follower# (-> (html/select enlive-userpage [:div.zm-profile-side-following.zg-clear])
+                      (html/select [:strong])
+                      second
+                      :content
+                      first
+                      Integer/parseInt)]
     {:name (-> (html/select enlive-userpage [:span.name])
                last
                :content
@@ -165,4 +145,16 @@
      :answer# (second navbar-numbers)
      :question# (first navbar-numbers)
      :favoriate# (nth navbar-numbers 3)
+     :followee# followee#
+     :follower# follower#
+     :followees (delay (get-followees id followee#))
+     :followers (delay (get-followers id follower#))
      }))
+
+(defn get-answers
+  "given a user id get a set of all answers"
+  [])
+
+(defn get-questions
+  "given a user id get a set of all questions"
+  [])
