@@ -63,10 +63,11 @@ in China, and perform various actions.
 
 * =TODO=
 
-- [X] :: =get-profile= function
-- [ ] :: functions about the properties of answers
-- [ ] :: functions about the properties of questions
-- [ ] :: functions about actions of the user
+- [X] =get-profile= function
+- [ ] use lazy sequence for long lists
+- [ ] functions about the properties of answers
+- [ ] functions about the properties of questions
+- [ ] functions about actions of the user
 
 * License
 
