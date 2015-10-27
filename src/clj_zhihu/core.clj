@@ -24,8 +24,7 @@
                         :body
                         (re-seq (:homepageid regex-map))
                         (map second)))
-            #{}
-            (range 0 (Math/ceil (/ followee# 20))))))
+            #{} (range 0 (Math/ceil (/ followee# 20))))))
 
 (defn ^:private get-followers
   "given user id return a set of user id of the followers"
@@ -46,8 +45,7 @@
                         :body
                         (re-seq (:homepageid regex-map))
                         (map second)))
-            #{}
-            (range 0 (Math/ceil (/ follower# 20))))))
+            #{} (range 0 (Math/ceil (/ follower# 20))))))
 
 (defn user
   "given user id return a user map"

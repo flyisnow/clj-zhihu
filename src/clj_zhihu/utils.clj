@@ -2,7 +2,7 @@
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
             [seesaw.core :as ss])
-  (:import [org.apache.commons.io.IOUtils]))
+  (:import [org.apache.commons.io IOUtils]))
 
 (def regex-map
   {:hashid #"hash_id&quot;: &quot;(.*)&quot;},"
