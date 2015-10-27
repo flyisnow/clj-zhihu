@@ -10,20 +10,19 @@
   [id followee#]
   (let [url      "http://www.zhihu.com/node/ProfileFolloweesListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl
-                     client/get
-                     :body)]
+        userpage (-> userurl client/get :body)]
     (reduce #(into %1
-                   (->> (client/post url
-                                     {:form-params
-                                      {:method "next"
-                                       :params (json/write-str
-                                                {:offset (* 20 %2)
-                                                 :order_by "created"
-                                                 :hash_id (get-hashid userpage)})
-                                       :_xsrf (get-xsrf userpage)}})
+                   (->> (client/post
+                         url
+                         {:form-params
+                          {:method "next"
+                           :params (json/write-str
+                                    {:offset (* 20 %2)
+                                     :order_by "created"
+                                     :hash_id (get-hashid userpage)})
+                           :_xsrf (get-xsrf userpage)}})
                         :body
-                        (re-seq #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\"")
+                        (re-seq (:homepageid regex-map))
                         (map second)))
             #{}
             (range 0 (Math/ceil (/ followee# 20))))))
@@ -33,20 +32,19 @@
   [id follower#]
   (let [url      "http://www.zhihu.com/node/ProfileFollowersListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl
-                     client/get
-                     :body)]
+        userpage (-> userurl client/get :body)]
     (reduce #(into %1
-                   (->> (client/post url
-                                     {:form-params
-                                      {:method "next"
-                                       :params (json/write-str
-                                                {:offset (* 20 %2)
-                                                 :order_by "created"
-                                                 :hash_id (get-hashid userpage)})
-                                       :_xsrf (get-xsrf userpage)}})
+                   (->> (client/post
+                         url
+                         {:form-params
+                          {:method "next"
+                           :params (json/write-str
+                                    {:offset (* 20 %2)
+                                     :order_by "created"
+                                     :hash_id (get-hashid userpage)})
+                           :_xsrf (get-xsrf userpage)}})
                         :body
-                        (re-seq #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\"")
+                        (re-seq (:homepageid regex-map))
                         (map second)))
             #{}
             (range 0 (Math/ceil (/ follower# 20))))))
@@ -59,89 +57,56 @@
                      client/get
                      :body)
         enlive-userpage (html/html-resource (java.io.StringReader. userpage))
-        enlive-navbarnode (html/select enlive-userpage [:div.profile-navbar.clearfix])
+        enlive-navbarnode (html/select enlive-userpage
+                                       [:div.profile-navbar.clearfix])
         navbar-numbers (map (comp #(Integer/parseInt %) first :content)
                             (html/select enlive-navbarnode [:span.num]))
-        followee# (-> (html/select enlive-userpage [:div.zm-profile-side-following.zg-clear])
+        followee# (-> (html/select enlive-userpage
+                                   [:div.zm-profile-side-following.zg-clear])
                       (html/select [:strong])
-                      first
-                      :content
-                      first
-                      Integer/parseInt)
+                      first :content first Integer/parseInt)
         follower# (-> (html/select enlive-userpage [:div.zm-profile-side-following.zg-clear])
                       (html/select [:strong])
-                      second
-                      :content
-                      first
-                      Integer/parseInt)]
+                      second :content first Integer/parseInt)]
     {:name (-> (html/select enlive-userpage [:span.name])
-               last
-               :content
-               first)
+               last :content first)
      :mood (-> (html/select enlive-userpage [:span.bio])
-               first
-               :content
-               first)
+               first :content first)
      :icon (-> (html/select enlive-userpage [:img.avatar.avatar-l])
-               last
-               :attrs
-               :src)
+               last :attrs :src)
      :location (-> (html/select enlive-userpage [:span.location.item])
-                   last
-                   :attrs
-                   :title)
+                   last :attrs :title)
      :business (-> (html/select enlive-userpage [:span.business.item])
-                   last
-                   :attrs
-                   :title)
+                   last :attrs :title)
      :gender ((fn [class-name]
                 (if (.contains class-name "male")
                   :male
                   (when (.contains class-name "female")
                     :female)))
               (-> (html/select enlive-userpage [:span.item.gender])
-                  first
-                  :content
-                  first
-                  :attrs
-                  :class))
+                  first :content first :attrs :class))
      :employment (-> (html/select enlive-userpage [:span.employment.item])
-                     last
-                     :attrs
-                     :title)
+                     last :attrs :title)
      :position (-> (html/select enlive-userpage [:span.position.item])
-                   last
-                   :attrs
-                   :title)
+                   last :attrs :title)
      :education (-> (html/select enlive-userpage [:span.education.item])
-                    last
-                    :attrs
-                    :title)
+                    last :attrs :title)
      :major (-> (html/select enlive-userpage [:span.education-extra.item])
-                last
-                :attrs
-                :title)
-     :description (-> (html/select enlive-userpage [:span.description.unfold-item])
+                last :attrs :title)
+     :description (-> (html/select enlive-userpage
+                                   [:span.description.unfold-item])
                       last
                       (html/select [:span.content])
-                      last
-                      :content
-                      first
-                      clojure.string/trim)
-     :upvote# (-> (html/select enlive-userpage [:span.zm-profile-header-user-agree])
+                      last :content first clojure.string/trim)
+     :upvote# (-> (html/select enlive-userpage
+                               [:span.zm-profile-header-user-agree])
                   last
                   (html/select [:strong])
-                  last
-                  :content
-                  first
-                  Integer/parseInt)
-     :thank# (-> (html/select enlive-userpage [:span.zm-profile-header-user-thanks])
-                 last
-                 (html/select [:strong])
-                 last
-                 :content
-                 first
-                 Integer/parseInt)
+                  last :content first Integer/parseInt)
+     :thank# (-> (html/select enlive-userpage
+                              [:span.zm-profile-header-user-thanks])
+                 last (html/select [:strong])
+                 last :content first Integer/parseInt)
      :answer# (second navbar-numbers)
      :question# (first navbar-numbers)
      :favoriate# (nth navbar-numbers 3)

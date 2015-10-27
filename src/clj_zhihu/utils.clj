@@ -6,7 +6,8 @@
 
 (def regex-map
   {:hashid #"hash_id&quot;: &quot;(.*)&quot;},"
-   :xsrf #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""})
+   :xsrf #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""
+   :homepageid #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\""})
 
 (defn get-xsrf
   "get the xsrf value given an html page"
