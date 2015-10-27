@@ -39,7 +39,7 @@ in China, and perform various actions.
 
   ;; Since getting followers and followees is time consuming, you have
   ;; to deref if when you really need them
-  (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu-lxr"]
+  (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu"]
     @(:followees (core/user "meliorare")))
 
   ;; #{"shi-cheng-tuo" "123highsun" "CherrySu" "bearzx"
