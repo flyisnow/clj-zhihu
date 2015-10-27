@@ -1,9 +1,10 @@
 (ns clj-zhihu.auth
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [taoensso.nippy :as nippy])
+            [taoensso.nippy :as nippy]
+            [clojure.data.json :as json])
   (:import [org.apache.commons.io IOUtils])
-  (:use [clj-zhihu.utils (get-xsrf get-hashid get-captcha)]))
+  (:use [clj-zhihu.utils]))
 
 ;; (def headers-for-zhihu
 ;;   {:Accept "*/*"
@@ -17,7 +18,6 @@
 ;;    :User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/45.0.2454.101 Chrome/45.0.2454.101 Safari/537.36"
 ;;    :X-Requested-With "XMLHttpRequest"})
 
-
 (defn ^:private force-login
   "log in zhihu and return the cookie store"
   [user pass]
@@ -27,7 +27,9 @@
             form-submit-url   "http://www.zhihu.com/login/email"
             login-page-source (:body (client/get login-page-url))
             captcha           (get-captcha)
-            xsrf              (get-xsrf login-page-source)]
+            xsrf              (find-by-regex login-page-source
+                                             #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""
+                                             not-empty)]
         (case  (-> (:body (client/post form-submit-url
                                        {:form-params
                                         {:email user

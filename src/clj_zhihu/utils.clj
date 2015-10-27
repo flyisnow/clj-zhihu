@@ -1,29 +1,35 @@
 (ns clj-zhihu.utils
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [seesaw.core :as ss]))
+            [seesaw.core :as ss])
+  (:import [org.apache.commons.io.IOUtils]))
+
+(def regex-map
+  {:hashid #"hash_id&quot;: &quot;(.*)&quot;},"
+   :xsrf #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""})
 
 (defn get-xsrf
   "get the xsrf value given an html page"
   [html-source]
-  (if-let [xsrf (last (re-find
-                       #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""
-                       html-source))]
-    (if (< (count xsrf) 5)
-      (throw (Exception. "xsrf not valid!"))
-      xsrf)
-    (throw (Exception. "xsrf not found!"))))
+  (find-by-regex html-source
+                 (:xsrf regex-map)
+                 not-empty))
 
 (defn get-hashid
-  "get the hashid value given an html page"
+  "get the hash id given an html page"
   [html-source]
-  (if-let [hashid (last (re-find
-                         #"hash_id&quot;: &quot;(.*)&quot;},"
-                         html-source))]
-    (if (< (count hashid) 5)
-      (throw (Exception. "hashid not valid!"))
-      hashid)
-    (throw (Exception. "hashid not found!"))))
+  (find-by-regex html-source
+                 (:hashid regex-map)
+                 not-empty))
+
+(defn find-by-regex
+  "return the last group element given a regex and source"
+  [source reg validator]
+  (if-let [e (last (re-find reg source))]
+    (if (validator e)
+      e
+      (throw (Exception. "Result not valid!")))
+    (throw (Exception. "Result not found!"))))
 
 (defn get-captcha
   "return the captcha"

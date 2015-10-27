@@ -14,7 +14,7 @@
                      :body)]
     (-> (java.io.StringReader.  userpage)
         html/html-resource
-        (html/select  [:div.zm-profile-side-following.zg-clear])
+        (html/select [:div.zm-profile-side-following.zg-clear])
         (html/select [:strong])
         first
         :content
@@ -89,21 +89,80 @@
   (let [userurl (str "http://www.zhihu.com/people/" id)
         userpage (-> userurl
                      client/get
-                     :body)]
-    {:name nil
-     :mood nil
-     :icon nil
-     :location nil
-     :field nil
-     :gender nil
-     :company nil
-     :position nil
-     :school nil
-     :major nil
-     :description nil
-     :upvote nil
-     :thank nil
-     :answer# nil
-     :question# nil
-     :favoriate# nil
+                     :body)
+        enlive-userpage (html/html-resource (java.io.StringReader. userpage))
+        enlive-navbarnode (html/select enlive-userpage [:div.profile-navbar.clearfix])
+        navbar-numbers (map (comp #(Integer/parseInt %) first :content)
+                            (html/select enlive-navbarnode [:span.num]))]
+    {:name (-> (html/select enlive-userpage [:span.name])
+               last
+               :content
+               first)
+     :mood (-> (html/select enlive-userpage [:span.bio])
+               first
+               :content
+               first)
+     :icon (-> (html/select enlive-userpage [:img.avatar.avatar-l])
+               last
+               :attrs
+               :src)
+     :location (-> (html/select enlive-userpage [:span.location.item])
+                   last
+                   :attrs
+                   :title)
+     :business (-> (html/select enlive-userpage [:span.business.item])
+                   last
+                   :attrs
+                   :title)
+     :gender ((fn [class-name]
+                (if (.contains class-name "male")
+                  :male
+                  (when (.contains class-name "female")
+                    :female)))
+              (-> (html/select enlive-userpage [:span.item.gender])
+                  first
+                  :content
+                  first
+                  :attrs
+                  :class))
+     :employment (-> (html/select enlive-userpage [:span.employment.item])
+                     last
+                     :attrs
+                     :title)
+     :position (-> (html/select enlive-userpage [:span.position.item])
+                   last
+                   :attrs
+                   :title)
+     :education (-> (html/select enlive-userpage [:span.education.item])
+                    last
+                    :attrs
+                    :title)
+     :major (-> (html/select enlive-userpage [:span.education-extra.item])
+                last
+                :attrs
+                :title)
+     :description (-> (html/select enlive-userpage [:span.description.unfold-item])
+                      last
+                      (html/select [:span.content])
+                      last
+                      :content
+                      first
+                      clojure.string/trim)
+     :upvote# (-> (html/select enlive-userpage [:span.zm-profile-header-user-agree])
+                  last
+                  (html/select [:strong])
+                  last
+                  :content
+                  first
+                  Integer/parseInt)
+     :thank# (-> (html/select enlive-userpage [:span.zm-profile-header-user-thanks])
+                 last
+                 (html/select [:strong])
+                 last
+                 :content
+                 first
+                 Integer/parseInt)
+     :answer# (second navbar-numbers)
+     :question# (first navbar-numbers)
+     :favoriate# (nth navbar-numbers 3)
      }))
