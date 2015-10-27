@@ -37,6 +37,25 @@ in China, and perform various actions.
   ;;   "mo-mo-35-48" "caroline-76" "hoyaech" "bai-ru-bing-58"
   ;;   "deborah-lee" "you-jiang-55" "Maocho-Ye" "zhang-xiao-ping-1024"
   ;;   "summer-clover" "andrew-shen-29"}
+
+  (core/get-profile "meliorare")
+  ;; {:description "",
+  ;;  :employment "斯坦福大学 (Stanford University)",
+  ;;  :answer# 46,
+  ;;  :question# 5,
+  ;;  :name "冰橙",
+  ;;  :favoriate# 8,
+  ;;  :icon "https://pic2.zhimg.com/74041affad1d92666f99a974def79239_l.jpg",
+  ;;  :mood "要做一个高级的人",
+  ;;  :major "机器学习",
+  ;;  :position "Visiting Student Researcher",
+  ;;  :education "罗彻斯特大学 (University of Rochester)",
+  ;;  :business "科研",
+  ;;  :gender :male,
+  ;;  :upvote# 2763,
+  ;;  :location "美国",
+  ;;  :thank# 419}
+
 #+END_SRC
 
 * =TODO=
