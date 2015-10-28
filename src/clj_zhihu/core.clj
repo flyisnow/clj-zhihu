@@ -1,51 +1,53 @@
-(ns clj-zhihu.core
+(ns clj-zhihu.core ^{:author "Xiangru Lian"}
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
             [clojure.data.json :as json]
-            [net.cgrand.enlive-html :as html])
-  (:use [clj-zhihu.utils]))
+            [net.cgrand.enlive-html :as html]
+            [clj-zhihu.utils :refer [get-hashid
+                                     get-xsrf
+                                     find-by-regex
+                                     get-captcha
+                                     regex-map]]))
 
-(defn ^:private get-followees
-  "get a set of followees' id given the id of a user"
+(defn- get-followees
+  "get a sequence of followees' id given the id of a user"
   [id followee#]
   (let [url      "http://www.zhihu.com/node/ProfileFolloweesListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
         userpage (-> userurl client/get :body)]
-    (reduce #(into %1
-                   (->> (client/post
-                         url
-                         {:form-params
-                          {:method "next"
-                           :params (json/write-str
-                                    {:offset (* 20 %2)
-                                     :order_by "created"
-                                     :hash_id (get-hashid userpage)})
-                           :_xsrf (get-xsrf userpage)}})
-                        :body
-                        (re-seq (:homepageid regex-map))
-                        (map second)))
-            #{} (range 0 (Math/ceil (/ followee# 20))))))
+    (mapcat #(->> (client/post
+                   url
+                   {:form-params
+                    {:method "next"
+                     :params (json/write-str
+                              {:offset (* 20 %1)
+                               :order_by "created"
+                               :hash_id (get-hashid userpage)})
+                     :_xsrf (get-xsrf userpage)}})
+                  :body
+                  (re-seq (:homepageid regex-map))
+                  (map second))
+            (range 0 (Math/ceil (/ followee# 20))))))
 
-(defn ^:private get-followers
-  "given user id return a set of user id of the followers"
+(defn-  get-followers
+  "given user id return a sequence of user id of the followers"
   [id follower#]
   (let [url      "http://www.zhihu.com/node/ProfileFollowersListV2"
         userurl  (str "http://www.zhihu.com/people/" id "/followers")
         userpage (-> userurl client/get :body)]
-    (reduce #(into %1
-                   (->> (client/post
-                         url
-                         {:form-params
-                          {:method "next"
-                           :params (json/write-str
-                                    {:offset (* 20 %2)
-                                     :order_by "created"
-                                     :hash_id (get-hashid userpage)})
-                           :_xsrf (get-xsrf userpage)}})
-                        :body
-                        (re-seq (:homepageid regex-map))
-                        (map second)))
-            #{} (range 0 (Math/ceil (/ follower# 20))))))
+    (mapcat #(->> (client/post
+                   url
+                   {:form-params
+                    {:method "next"
+                     :params (json/write-str
+                              {:offset (* 20 %1)
+                               :order_by "created"
+                               :hash_id (get-hashid userpage)})
+                     :_xsrf (get-xsrf userpage)}})
+                  :body
+                  (re-seq (:homepageid regex-map))
+                  (map second))
+            (range 0 (Math/ceil (/ follower# 20))))))
 
 (defn user
   "given user id return a user map"
@@ -123,5 +125,3 @@
 (defn get-questions
   "given a user id get a set of all questions"
   [])
-
-

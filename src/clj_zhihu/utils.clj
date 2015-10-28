@@ -1,6 +1,7 @@
 (ns clj-zhihu.utils
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
+            [taoensso.nippy :as nippy]
             [seesaw.core :as ss])
   (:import [org.apache.commons.io IOUtils]))
 
@@ -55,3 +56,21 @@
                                            (javax.swing.ImageIcon. captcha-bytearray))))
        ss/pack!
        ss/show!))))
+
+
+(defn write-cookie-store
+  "save cookie corresponding to a user"
+  [user cookie-store]
+  (with-open [f (io/output-stream (io/file "resources"
+                                           "cookies"
+                                           user))]
+    (.write f (nippy/freeze cookie-store)))
+  cookie-store)
+
+(defn read-cookie-store
+  "read cookie store given a user"
+  [user]
+  (if-let [cookie-file (io/resource (str "cookies/" user))]
+    (with-open [f (io/input-stream cookie-file)]
+      (nippy/thaw (IOUtils/toByteArray f)))))
+
