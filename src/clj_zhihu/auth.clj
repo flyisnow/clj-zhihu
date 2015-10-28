@@ -4,7 +4,8 @@
             [clojure.data.json :as json]
             [clj-zhihu.utils :refer [get-xsrf get-captcha
                                      write-cookie-store
-                                     read-cookie-store]])
+                                     read-cookie-store
+                                     find-by-regex]])
     (:import [org.apache.commons.io IOUtils]))
 
 ;; (def headers-for-zhihu
@@ -28,9 +29,7 @@
             form-submit-url   "http://www.zhihu.com/login/email"
             login-page-source (:body (client/get login-page-url))
             captcha           (get-captcha)
-            xsrf              (find-by-regex login-page-source
-                                             #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""
-                                             not-empty)]
+            xsrf              (get-xsrf login-page-source)]
         (case  (-> (:body (client/post form-submit-url
                                        {:form-params
                                         {:email user
