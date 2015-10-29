@@ -73,4 +73,3 @@
   (if-let [cookie-file (io/resource (str "cookies/" user))]
     (with-open [f (io/input-stream cookie-file)]
       (nippy/thaw (IOUtils/toByteArray f)))))
-
