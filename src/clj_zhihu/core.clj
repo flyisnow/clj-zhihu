@@ -113,53 +113,53 @@
         answer#           (second navbar-numbers)
         question#         (first navbar-numbers)
         favoriate#        (get navbar-numbers 3)]
-    {:name (-> (html/select enlive-userpage [:span.name])
-               last :content first)
-     :mood (-> (html/select enlive-userpage [:span.bio])
-               first :content first)
-     :icon (-> (html/select enlive-userpage [:img.avatar.avatar-l])
-               last :attrs :src)
-     :location (-> (html/select enlive-userpage [:span.location.item])
-                   last :attrs :title)
-     :business (-> (html/select enlive-userpage [:span.business.item])
-                   last :attrs :title)
-     :gender ((fn [class-name]
-                (if (nil? class-name)
-                  nil
-                  (if (.contains class-name "female")
-                    :female
-                    (when (.contains class-name "male")
-                      :male))))
-              (-> (html/select enlive-userpage [:span.item.gender])
-                  first :content first :attrs :class))
-     :employment (-> (html/select enlive-userpage [:span.employment.item])
-                     last :attrs :title)
-     :position (-> (html/select enlive-userpage [:span.position.item])
-                   last :attrs :title)
-     :education (-> (html/select enlive-userpage [:span.education.item])
-                    last :attrs :title)
-     :major (-> (html/select enlive-userpage [:span.education-extra.item])
-                last :attrs :title)
+    {:name        (-> (html/select enlive-userpage [:span.name])
+                      last :content first)
+     :mood        (-> (html/select enlive-userpage [:span.bio])
+                      first :content first)
+     :icon        (-> (html/select enlive-userpage [:img.avatar.avatar-l])
+                      last :attrs :src)
+     :location    (-> (html/select enlive-userpage [:span.location.item])
+                      last :attrs :title)
+     :business    (-> (html/select enlive-userpage [:span.business.item])
+                      last :attrs :title)
+     :gender      ((fn [class-name]
+                     (if (nil? class-name)
+                       nil
+                       (if (.contains class-name "female")
+                         :female
+                         (when (.contains class-name "male")
+                           :male))))
+                   (-> (html/select enlive-userpage [:span.item.gender])
+                       first :content first :attrs :class))
+     :employment  (-> (html/select enlive-userpage [:span.employment.item])
+                      last :attrs :title)
+     :position    (-> (html/select enlive-userpage [:span.position.item])
+                      last :attrs :title)
+     :education   (-> (html/select enlive-userpage [:span.education.item])
+                      last :attrs :title)
+     :major       (-> (html/select enlive-userpage [:span.education-extra.item])
+                      last :attrs :title)
      :description (-> (html/select enlive-userpage
                                    [:span.description.unfold-item])
                       last (html/select [:span.content])
                       last :content first)
-     :upvote# (-> (html/select enlive-userpage
-                               [:span.zm-profile-header-user-agree])
-                  last (html/select [:strong])
-                  last :content first (or "0") Integer/parseInt)
-     :thank# (-> (html/select enlive-userpage
-                              [:span.zm-profile-header-user-thanks])
-                 last (html/select [:strong])
-                 last :content first (or "0") Integer/parseInt)
-     :answer# answer#
-     :question# question#
-     :favoriate# favoriate#
-     :followee# followee#
-     :follower# follower#
-     :followees (get-followees id followee#)
-     :followers (get-followers id follower#)
-     :answers (get-answers id answer#)
+     :upvote#     (-> (html/select enlive-userpage
+                                   [:span.zm-profile-header-user-agree])
+                      last (html/select [:strong])
+                      last :content first (or "0") Integer/parseInt)
+     :thank#      (-> (html/select enlive-userpage
+                                   [:span.zm-profile-header-user-thanks])
+                      last (html/select [:strong])
+                      last :content first (or "0") Integer/parseInt)
+     :answer#     answer#
+     :question#   question#
+     :favoriate#  favoriate#
+     :followee#   followee#
+     :follower#   follower#
+     :followees   (get-followees id followee#)
+     :followers   (get-followers id follower#)
+     :answers     (get-answers id answer#)
      }))
 
 (defn get-questions
