@@ -64,8 +64,8 @@ in China, and perform various actions.
 * =TODO=
 
 - [X] =get-profile= function
-- [ ] use lazy sequence for long lists
-- [ ] functions about the properties of answers
+- [X] use lazy sequence for long lists
+- [X] functions about the properties of answers
 - [ ] functions about the properties of questions
 - [ ] functions about actions of the user
 
