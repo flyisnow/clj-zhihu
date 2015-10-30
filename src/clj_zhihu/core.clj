@@ -13,49 +13,66 @@
 (defn- get-followees
   "get a sequence of followees' id given the id of a user"
   [id followee#]
-  (let [url      "http://www.zhihu.com/node/ProfileFolloweesListV2"
-        userurl  (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl client/get :body)]
-    (mapcat #(->> (client/post
-                   url
-                   {:form-params
-                    {:method "next"
-                     :params (json/write-str
-                              {:offset (* 20 %1)
-                               :order_by "created"
-                               :hash_id (get-hashid userpage)})
-                     :_xsrf (get-xsrf userpage)}})
-                  :body
-                  (re-seq (:homepageid regex-map))
-                  (map second))
-            (range 0 (Math/ceil (/ followee# 20))))))
+  (if (zero? followee#)
+    '()
+    (try
+      (let [url      "http://www.zhihu.com/node/ProfileFolloweesListV2"
+            userurl  (str "http://www.zhihu.com/people/" id "/followers")
+            userpage (-> userurl client/get :body)
+            hashid   (get-hashid userpage)
+            xsrf     (get-xsrf userpage)]
+        (mapcat #(->> (client/post
+                       url
+                       {:form-params
+                        {:method "next"
+                         :params (json/write-str
+                                  {:offset (* 20 %1)
+                                   :order_by "created"
+                                   :hash_id hashid})
+                         :_xsrf xsrf}})
+                      :body
+                      (re-seq (:homepageid regex-map))
+                      (map second))
+                (range 0 (Math/ceil (/ followee# 20)))))
+      (catch Exception e nil))))
 
 (defn- get-followers
   "given user id return a sequence of user id of the followers"
   [id follower#]
-  (let [url      "http://www.zhihu.com/node/ProfileFollowersListV2"
-        userurl  (str "http://www.zhihu.com/people/" id "/followers")
-        userpage (-> userurl client/get :body)]
-    (mapcat #(->> (client/post
-                   url
-                   {:form-params
-                    {:method "next"
-                     :params (json/write-str
-                              {:offset (* 20 %1)
-                               :order_by "created"
-                               :hash_id (get-hashid userpage)})
-                     :_xsrf (get-xsrf userpage)}})
-                  :body
-                  (re-seq (:homepageid regex-map))
-                  (map second))
-            (range 0 (Math/ceil (/ follower# 20))))))
+  (if (zero? follower#)
+    '()
+    (try
+      (let [url      "http://www.zhihu.com/node/ProfileFollowersListV2"
+            userurl  (str "http://www.zhihu.com/people/" id "/followers")
+            userpage (-> userurl client/get :body)
+            hashid   (get-hashid userpage)
+            xsrf     (get-xsrf userpage)]
+        (mapcat #(->> (client/post
+                       url
+                       {:form-params
+                        {:method "next"
+                         :params (json/write-str
+                                  {:offset (* 20 %1)
+                                   :order_by "created"
+                                   :hash_id hashid})
+                         :_xsrf xsrf}})
+                      :body
+                      (re-seq (:homepageid regex-map))
+                      (map second))
+                (range 0 (Math/ceil (/ follower# 20)))))
+      (catch Exception e nil))))
+
+(defn- get-news
+  "given a user id get a sequence of news"
+  [id]
+  )
 
 (defn- get-answers
-  "given a user id get a set of all answers"
+  "given a user id get a sequence of all answers"
   [id answer#]
   (let [url (str "http://www.zhihu.com/people/" id "/answers")]
     (letfn [(get-page-tree
-                [page#]
+              [page#]
               (->> (client/get
                     url
                     {:query-params {:page page#}})
@@ -63,23 +80,23 @@
                    (java.io.StringReader.)
                    (html/html-resource)))
             (get-vote-sequence
-                [tree]
+              [tree]
               (->> (html/select tree [:div.zm-item-vote-info])
                    (map :attrs)
                    (map :data-votecount)
                    (map #(Integer/parseInt %))))
             (get-link-sequence
-                [tree]
+              [tree]
               (->> (html/select tree [:div.zm-item-rich-text])
                    (map :attrs)
                    (map :data-entry-url)))
             (get-content-sequence
-                [tree]
+              [tree]
               (->> (html/select tree [:textarea.content.hidden])
                    (map :content)
                    (map first)))
             (get-answer-map-sequence
-                [tree]
+              [tree]
               (letfn [(answer-map-construct [vote content link]
                         {:vote vote :content content :link link})]
                 (map apply (repeat answer-map-construct)
