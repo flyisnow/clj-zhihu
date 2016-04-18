@@ -24,23 +24,16 @@
             [slingshot.slingshot :refer [throw+ try+]]
             [clj-zhihu.utils :as utils]))
 
-(def ^:private headers
-  "Headers for posting and getting."
-  {:User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36",
-   :Host "www.zhihu.com",
-   :Referer "http://www.zhihu.com/",
-   :X-Requested-With "XMLHttpRequest"})
-
 (defn- get-login-captcha
   "Input login captcha"
   []
   ;; Some insane Zhihu logic
-  (client/get "https://www.zhihu.com" {:headers headers})
+  (client/get "https://www.zhihu.com" {:headers utils/*headers*})
   (client/post "https://www.zhihu.com/login/email"
                {:form-params {:email ""
                               :password ""
                               :remember_me true}
-                :headers headers})
+                :headers utils/*headers*})
   (utils/download (str "https://www.zhihu.com/captcha.gif?r="
                     (System/currentTimeMillis)
                     "&type=login")
@@ -51,14 +44,14 @@
 (defn- post-login-info
   "Post login info. Return response map."
   [username password]
-  (client/get "https://www.zhihu.com/#signin" {:headers headers})
+  (client/get "https://www.zhihu.com/#signin" {:headers utils/*headers*})
   (-> (client/post "https://www.zhihu.com/login/email"
                    {:form-params {:email username
                                   :password password
                                   :remember_me true
                                   :_xsrf (utils/get-xsrf)
                                   :captcha (get-login-captcha)}
-                    :headers headers})
+                    :headers utils/*headers*})
       (:body)
       (json/read-str)))
 
@@ -67,7 +60,8 @@
   [username password]
   (have string? username)
   (have string? password)
-  (binding [clj-http.core/*cookie-store* (cookie/cookie-store)]
+  (binding [clj-http.core/*cookie-store* (cookie/cookie-store)
+            utils/*headers* utils/generic-headers]
     (let [resp (post-login-info username password)]
       (if (= 0 (get resp "r"))
         clj-http.core/*cookie-store*

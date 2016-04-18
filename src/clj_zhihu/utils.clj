@@ -18,6 +18,17 @@
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]))
 
+(def ^:dynamic *headers*
+  "headers for posting and getting"
+  nil)
+
+(def generic-headers
+  "Generic headers for posting and getting."
+  {:User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36",
+   :Host "www.zhihu.com",
+   :Referer "http://www.zhihu.com/",
+   :X-Requested-With "XMLHttpRequest"})
+
 (defn get-xsrf
   "get the xsrf value given cookiestore"
   []
@@ -29,6 +40,6 @@
   "Download from url to path."
   [url path]
   (with-open [f (io/output-stream (io/file path))]
-    (->> (client/get url {:as :byte-array})
+    (->> (client/get url {:as :byte-array :headers *headers*})
          :body
          (.write f))))
