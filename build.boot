@@ -1,15 +1,17 @@
 (set-env! :resource-paths #{"resources"}
           :source-paths   #{"test" "src"}
-          :dependencies   #(concat % '[[org.clojure/clojure "1.8.0"]
-                                       [clj-http "RELEASE"]
+          :dependencies   #(into % '[[org.clojure/clojure "1.8.0"]
+                                       [clj-http "2.1.0"]
                                        [seesaw "RELEASE"]
-                                       [midje "RELEASE"]
-                                       [org.clojure/data.json "RELEASE"]
                                        [slingshot "RELEASE"]
+                                       [com.taoensso/truss "RELEASE"]
+                                       ;; [midje "RELEASE"]
+                                       [org.clojure/data.json "RELEASE"]
                                        [enlive "RELEASE"]
-                                       [zilti/boot-midje "RELEASE"]]))
+                                       ;; [zilti/boot-midje "RELEASE"]
+                                       ]))
 
-(def project 'clj_project)
+(def project 'clj_zhihu)
 (def version "0.1.0-SNAPSHOT")
 
 (task-options!
@@ -37,4 +39,4 @@
 ;;   (require '[clj_project.core :as app])
 ;;   (apply (resolve 'app/-main) args))
 
-(require '[zilti.boot-midje :refer [midje]])
+;; (require '[zilti.boot-midje :refer [midje]])

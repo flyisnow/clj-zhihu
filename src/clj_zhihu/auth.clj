@@ -23,29 +23,49 @@
             [taoensso.truss :as truss :refer (have have! have?)]
             [slingshot.slingshot :refer [throw+ try+]]
             [clj-zhihu.utils :as utils]
-            ;; [aprint.core :refer [aprint ap]]
-            ;; [clojure.reflect :refer [reflect]]
+            [aprint.core :refer [aprint ap]]
+            [clojure.reflect :refer [reflect]]
+            [net.cgrand.enlive-html :as html]
             ))
+
+(def ^:private headers
+  "Headers for posting and getting."
+  {
+   :User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36",
+   :Host "www.zhihu.com",
+   :Referer "http://www.zhihu.com/",
+   :X-Requested-With "XMLHttpRequest"
+   }
+  )
 
 (defn- get-login-captcha
   "Input login captcha"
-  [cookie-store]
-  (utils/download "http://www.zhihu.com/captcha.gif"
-                  "resources/captcha.gif"
-                  cookie-store)
+  []
+  ;; Some insane Zhihu logic
+  (client/get "https://www.zhihu.com" {:headers headers})
+  (client/post "https://www.zhihu.com/login/email" {:form-params
+                                                    {:email ""
+                                                     :password ""
+                                                     :remember_me true}
+                                                    :headers headers})
+  (utils/download (str "https://www.zhihu.com/captcha.gif?r="
+                    (System/currentTimeMillis)
+                    "&type=login")
+                  "resources/captcha.gif")
   (prn "Captcha saved in resources/captcha.gif, please input the text.")
   (read-line))
 
 (defn- post-login-info
   "Post login info. Return response map."
-  [username password cookie-store]
-  (-> (client/post "http://www.zhihu.com/login/email"
-                   {:form-params {:email username
-                                  :password password
-                                  :remenber_me true
-                                  :_xsrf (utils/get-xsrf cookie-store)
-                                  :captcha (get-login-captcha cookie-store)}
-                    :cookie-store cookie-store})
+  [username password]
+  (client/get "https://www.zhihu.com/#signin" {:headers headers})
+  (-> (client/post "https://www.zhihu.com/login/email"
+        {:form-params {:email username
+                       :password password
+                       :remember_me true
+                       :_xsrf (utils/get-xsrf)
+                       :captcha (get-login-captcha)}
+         :headers headers})
       (:body)
       (json/read-str)))
 
@@ -54,12 +74,11 @@
   [username password]
   (have string? username)
   (have string? password)
-  (let [cookie-store (cookie/cookie-store)
-        resp (post-login-info username password cookie-store)]
-    (if (= 0 (get resp "r"))
-      cookie-store
-      (throw+ [:type :login-failed]))
-     ))
+  (binding [clj-http.core/*cookie-store* (cookie/cookie-store)]
+    (let [resp (post-login-info username password)]
+      (if (= 0 (get resp "r"))
+        clj-http.core/*cookie-store*
+        (throw+ {:type :login-failed :response resp})))))
 
 (defn login?
   "return true if logged in with a cookie store, otherwise false"
@@ -68,3 +87,5 @@
      (:status (client/get "http://www.zhihu.com/settings/profile"
                           {:max-redirects 0
                            :cookie-store cookie-store}))))
+
+;; (login "lianxiangru@gmail.com" "VEqHr1LbTS0Kg")

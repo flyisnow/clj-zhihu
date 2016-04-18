@@ -1,22 +1,35 @@
+;; clj-zhihu
+;; Copyright (C) 2016  Xiangru Lian <xlian@gmx.com>
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 (ns clj-zhihu.utils
   (:require [clj-http.client :as client]
-            [clojure.java.io :as io]
-            [seesaw.core :as ss])
-  (:import [org.apache.commons.io IOUtils]))
+            [clojure.java.io :as io]))
 
 (defn get-xsrf
   "get the xsrf value given cookiestore"
-  [cookie-store]
-  (-> (clj-http.cookies/get-cookies cookie-store)
+  []
+  (-> (clj-http.cookies/get-cookies @(resolve 'clj-http.core/*cookie-store*))
       (get "_xsrf")
       :value))
 
 (defn download
   "Download from url to path."
-  [url path cookie-store]
+  [url path]
   (with-open [f (io/output-stream (io/file path))]
-    (.write f (:body (client/get url {:as :byte-array
-                                      :cookie-store cookie-store})))))
+    (.write f (:body (client/get url {:as :byte-array})))))
 
 (def regex-map
   {:hashid #"hash_id&quot;: &quot;(.*)&quot;},"
@@ -32,22 +45,9 @@
       (throw (Exception. "Result not valid!")))
     (throw (Exception. "Result not found!"))))
 
-
 (defn get-hashid
   "get the hash id given an html page"
   [html-source]
   (find-by-regex html-source
                  (:hashid regex-map)
                  not-empty))
-
-(defn show-image
-  "show an image in a JFrame"
-  [image-path]
-  (with-open [captcha-stream (io/input-stream (io/resource image-path))]
-    (let [captcha-bytearray (IOUtils/toByteArray captcha-stream)]
-      (->
-       (ss/frame :title "Captcha"
-                 :content (ss/label :icon (seesaw.icon/icon
-                                           (javax.swing.ImageIcon. captcha-bytearray))))
-       ss/pack!
-       ss/show!))))
