@@ -1,7 +1,10 @@
+#+title: clj-zhihu
+#+author: Xiangru Lian
+
 * clj-zhihu
 
-A Clojure library designed to log into Zhihu, which is a Q&A website
-in China, and perform various actions.
+A Clojure library designed to log into Zhihu, which is a Q&A website in China,
+and perform various actions.
 
 * Installation
 
@@ -71,7 +74,6 @@ in China, and perform various actions.
 
 * License
 
-Copyright © 2015 FIXME
+Copyright © 2015 Xiangru Lian <xlian@gmx.com>
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+Distributed under the GPLv3.
