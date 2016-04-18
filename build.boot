@@ -1,5 +1,5 @@
 (set-env! :resource-paths #{"resources"}
-          :source-paths   #{"test" "src"}
+          :source-paths   #{"src"}
           :dependencies   #(into % '[[org.clojure/clojure "1.8.0"]
                                        [clj-http "2.1.0"]
                                        [seesaw "RELEASE"]
