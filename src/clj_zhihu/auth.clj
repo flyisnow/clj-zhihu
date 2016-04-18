@@ -22,29 +22,25 @@
             [clojure.data.json :as json]
             [taoensso.truss :as truss :refer (have have! have?)]
             [slingshot.slingshot :refer [throw+ try+]]
-            [clj-zhihu.utils :as utils]
-            ))
+            [clj-zhihu.utils :as utils]))
 
 (def ^:private headers
   "Headers for posting and getting."
-  {
-   :User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36",
+  {:User-Agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36",
    :Host "www.zhihu.com",
    :Referer "http://www.zhihu.com/",
-   :X-Requested-With "XMLHttpRequest"
-   }
-  )
+   :X-Requested-With "XMLHttpRequest"})
 
 (defn- get-login-captcha
   "Input login captcha"
   []
   ;; Some insane Zhihu logic
   (client/get "https://www.zhihu.com" {:headers headers})
-  (client/post "https://www.zhihu.com/login/email" {:form-params
-                                                    {:email ""
-                                                     :password ""
-                                                     :remember_me true}
-                                                    :headers headers})
+  (client/post "https://www.zhihu.com/login/email"
+               {:form-params {:email ""
+                              :password ""
+                              :remember_me true}
+                :headers headers})
   (utils/download (str "https://www.zhihu.com/captcha.gif?r="
                     (System/currentTimeMillis)
                     "&type=login")
@@ -57,12 +53,12 @@
   [username password]
   (client/get "https://www.zhihu.com/#signin" {:headers headers})
   (-> (client/post "https://www.zhihu.com/login/email"
-        {:form-params {:email username
-                       :password password
-                       :remember_me true
-                       :_xsrf (utils/get-xsrf)
-                       :captcha (get-login-captcha)}
-         :headers headers})
+                   {:form-params {:email username
+                                  :password password
+                                  :remember_me true
+                                  :_xsrf (utils/get-xsrf)
+                                  :captcha (get-login-captcha)}
+                    :headers headers})
       (:body)
       (json/read-str)))
 

@@ -29,4 +29,6 @@
   "Download from url to path."
   [url path]
   (with-open [f (io/output-stream (io/file path))]
-    (.write f (:body (client/get url {:as :byte-array})))))
+    (->> (client/get url {:as :byte-array})
+         :body
+         (.write f))))
