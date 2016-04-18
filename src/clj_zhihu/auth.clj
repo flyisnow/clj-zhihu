@@ -14,7 +14,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-(ns ^{:doc "The clj-zhihu auth functionality."
+(ns ^{:doc    "The clj-zhihu auth functionality."
       :author "Xiangru Lian"}
     clj-zhihu.auth
   (:require [clj-http.client :as client]
@@ -30,10 +30,10 @@
   ;; Some insane Zhihu logic
   (client/get "https://www.zhihu.com" {:headers utils/*headers*})
   (client/post "https://www.zhihu.com/login/email"
-               {:form-params {:email ""
-                              :password ""
+               {:form-params {:email       ""
+                              :password    ""
                               :remember_me true}
-                :headers utils/*headers*})
+                :headers     utils/*headers*})
   (utils/download (str "https://www.zhihu.com/captcha.gif?r="
                     (System/currentTimeMillis)
                     "&type=login")
@@ -46,12 +46,12 @@
   [username password]
   (client/get "https://www.zhihu.com/#signin" {:headers utils/*headers*})
   (-> (client/post "https://www.zhihu.com/login/email"
-                   {:form-params {:email username
-                                  :password password
+                   {:form-params {:email       username
+                                  :password    password
                                   :remember_me true
-                                  :_xsrf (utils/get-xsrf)
-                                  :captcha (get-login-captcha)}
-                    :headers utils/*headers*})
+                                  :_xsrf       (utils/get-xsrf)
+                                  :captcha     (get-login-captcha)}
+                    :headers     utils/*headers*})
       (:body)
       (json/read-str)))
 
@@ -61,7 +61,7 @@
   (have string? username)
   (have string? password)
   (binding [clj-http.core/*cookie-store* (cookie/cookie-store)
-            utils/*headers* utils/generic-headers]
+            utils/*headers*              utils/generic-headers]
     (let [resp (post-login-info username password)]
       (if (= 0 (get resp "r"))
         clj-http.core/*cookie-store*
@@ -73,4 +73,4 @@
   (= 200
      (:status (client/get "http://www.zhihu.com/settings/profile"
                           {:max-redirects 0
-                           :cookie-store cookie-store}))))
+                           :cookie-store  cookie-store}))))
