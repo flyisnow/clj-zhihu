@@ -87,5 +87,3 @@
      (:status (client/get "http://www.zhihu.com/settings/profile"
                           {:max-redirects 0
                            :cookie-store cookie-store}))))
-
-;; (login "lianxiangru@gmail.com" "VEqHr1LbTS0Kg")
