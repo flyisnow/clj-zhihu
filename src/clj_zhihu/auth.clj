@@ -23,9 +23,6 @@
             [taoensso.truss :as truss :refer (have have! have?)]
             [slingshot.slingshot :refer [throw+ try+]]
             [clj-zhihu.utils :as utils]
-            [aprint.core :refer [aprint ap]]
-            [clojure.reflect :refer [reflect]]
-            [net.cgrand.enlive-html :as html]
             ))
 
 (def ^:private headers
