@@ -30,24 +30,3 @@
   [url path]
   (with-open [f (io/output-stream (io/file path))]
     (.write f (:body (client/get url {:as :byte-array})))))
-
-(def regex-map
-  {:hashid #"hash_id&quot;: &quot;(.*)&quot;},"
-   :xsrf #"\<input\stype=\"hidden\"\sname=\"_xsrf\"\svalue=\"(\S+)\""
-   :homepageid #"<h2.*?\\\/people\\\/(.*?)\\\" class=\\\"zg-link\\\""})
-
-(defn find-by-regex
-  "return the last group element given a regex and source"
-  [source reg validator]
-  (if-let [e (last (re-find reg source))]
-    (if (validator e)
-      e
-      (throw (Exception. "Result not valid!")))
-    (throw (Exception. "Result not found!"))))
-
-(defn get-hashid
-  "get the hash id given an html page"
-  [html-source]
-  (find-by-regex html-source
-                 (:hashid regex-map)
-                 not-empty))
