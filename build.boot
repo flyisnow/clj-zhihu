@@ -4,6 +4,8 @@
                                        [clj-http "RELEASE"]
                                        [seesaw "RELEASE"]
                                        [midje "RELEASE"]
+                                       [org.clojure/data.json "RELEASE"]
+                                       [slingshot "RELEASE"]
                                        [enlive "RELEASE"]
                                        [zilti/boot-midje "RELEASE"]]))
 
