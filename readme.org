@@ -1,8 +1,8 @@
 #+title: clj-zhihu
 #+author: Xiangru Lian
 
-A Clojure library designed to log into Zhihu, which is a Q&A website in China,
-and perform various actions.
+A fully functional programming Clojure library designed to log into Zhihu, which
+is a Q&A website in China, and perform various actions.
 
 * Installation
 
@@ -11,6 +11,15 @@ and perform various actions.
 * Usage
 
 #+BEGIN_SRC clojure
+;; To get a cookie-store, use utils/login function
+
+;; Go with the power of functions!
+(binding [clj-http.core/*cookie-store* cookie-store]
+  (-> (question "https://www.zhihu.com/question/41945693")
+      ((juxt question-title question-description question-tags))))
+=> ["是不是喜欢东方project的男生很大一部分都有女装的倾向？为什么会这样呢？"
+ "其他的比如喜欢舰的，或者拉拉人呢？是因为喜欢可爱的女孩子喜欢得走火入魔了，所以自己也想变成可爱的女♂孩♂子了吗？全是女孩子的环境，会给人很想搞姬的冲动吧。"
+ ("伪娘" "东方Project" "舰队 Collection" "LoveLive!（ラブライブ!）" "女装少年")]
 #+END_SRC
 
 * =TODO=

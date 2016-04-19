@@ -29,7 +29,7 @@
   "Given an enlive structure, return question title."
   [m]
   (-> (html/select m [[:h2 (html/attr= :class "zm-item-title zm-editable-content")]])
-      first :content str/trim))
+      first :content first str/trim))
 
 (defn question-tags
   "Given an enlive structure, return the tags as a sequence."
@@ -60,4 +60,4 @@
 
 ;; (binding [clj-http.core/*cookie-store* cookie-store]
 ;;   (-> (question "https://www.zhihu.com/question/41945693")
-;;       question-answers))
+;;       ((juxt question-title question-description question-tags))))
