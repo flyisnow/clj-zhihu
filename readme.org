@@ -6,69 +6,14 @@ and perform various actions.
 
 * Installation
 
-=clj-zhihu= will be available as a Maven artifact from Clojars.
+Available as =[clj_zhihu "0.1.0-SNAPSHOT"]=.
 
 * Usage
 
 #+BEGIN_SRC clojure
-  (require '(clj-zhihu [auth :as auth] [core :as core]))
-
-  (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu"] ;; Your email address and password here
-    (core/user "meliorare")
-    )
-  ;; {:description "",
-  ;;  :follower# 2047,
-  ;;  :employment "斯坦福大学 (Stanford University)",
-  ;;  :answer# 46,
-  ;;  :question# 5,
-  ;;  :name "冰橙",
-  ;;  :favoriate# 8,
-  ;;  :icon "https://pic2.zhimg.com/74041affad1d92666f99a974def79239_l.jpg",
-  ;;  :followees #<Delay@654a8159: :not-delivered>,
-  ;;  :mood "要做一个高级的人",
-  ;;  :major "机器学习",
-  ;;  :followee# 67,
-  ;;  :position "Visiting Student Researcher",
-  ;;  :education "罗彻斯特大学 (University of Rochester)",
-  ;;  :business "科研",
-  ;;  :gender :male,
-  ;;  :upvote# 2763,
-  ;;  :location "美国",
-  ;;  :thank# 419,
-  ;;  :followers #<Delay@3697ebe5: :not-delivered>}
-
-
-  ;; Since getting followers and followees is time consuming, you have
-  ;; to deref if when you really need them
-  (auth/with-zhihu-account ["xlian2@cs.rochester.edu" "clj-zhihu"]
-    @(:followees (core/user "meliorare")))
-
-  ;; #{"shi-cheng-tuo" "123highsun" "CherrySu" "bearzx"
-  ;; "rongyijidewangzhi" "mao-bu-qun" "hua-yang-73" "ding-xiao-wen-18"
-  ;; "littlesue" "qing-shui-wu-xiang-88" "tian-yuan-dong"
-  ;; "zhou-mang-guo-31" "naiyan-wang" "moeka" "xiao-yu-29-96-99"
-  ;; "chuo-chan" "yu-ji-hu" "li-jin-yang-31" "xy-le-76"
-  ;; "xia-miao-bao-bao" "long-yu-82-36" "chi-gen" "xiao-mei-yan-81"
-  ;; "jianchichen" "iris-78-23" "IIllIIllIlIl" "minglei-xiao-50"
-  ;; "hui-hui-ai-zao-shui" "katherlee" "jean-proust" "chen-36-94"
-  ;; "be5invis" "simon212" "buchao" "komari-kamikita-30"
-  ;; "gu-qian-xun-41" "cheng-zhi-15" "filestorm" "yang-shi-yu-64"
-  ;; "lilew" "li-mu-23" "xie-qing-yan-43" "zhan-yan-2" "Ivony"
-  ;; "liu-xi-chang" "wu-rui-87-2-2" "flycicitsh" "fox4x4x4x"
-  ;; "stephenhky" "yxwxy" "runmin-zhang" "wenzhe-li" "yao-qing-yan-35"
-  ;; "phys-mse-75" "cai-xiao-dong-97" "suji-yan" "zhu-yi-zhe-73"
-  ;; "mo-mo-35-48" "caroline-76" "hoyaech" "bai-ru-bing-58"
-  ;; "deborah-lee" "you-jiang-55" "Maocho-Ye" "zhang-xiao-ping-1024"
-  ;; "summer-clover" "andrew-shen-29"}
 #+END_SRC
 
 * =TODO=
-
-- [X] =get-profile= function
-- [X] use lazy sequence for long lists
-- [X] functions about the properties of answers
-- [ ] functions about the properties of questions
-- [ ] functions about actions of the user
 
 * License
 
