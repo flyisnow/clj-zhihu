@@ -20,12 +20,44 @@
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
             [clojure.data.json :as json]
+            [clj-zhihu.utils :as utils]
             [net.cgrand.enlive-html :as html]
-            [clj-zhihu.auth :as auth]
-            [taoensso.truss :as truss]))
+            [taoensso.truss :as truss]
+            [clojure.string :as str]))
+
+(defn question-title
+  "Given an enlive structure, return question title."
+  [m]
+  (-> (html/select m [[:h2 (html/attr= :class "zm-item-title zm-editable-content")]])
+      first :content str/trim))
+
+(defn question-tags
+  "Given an enlive structure, return the tags as a sequence."
+  [m]
+  (->> (html/select m [[:a (html/attr= :class "zm-item-tag")]])
+       (mapcat :content)
+       (map str/trim)))
+
+(defn question-description
+  "Given an enlive structure, return the description."
+  [m]
+  (->> (html/select m [(html/attr= :class "zm-editable-content")])
+       first :content first str/trim))
+
+(defn question-answers
+  "Given an enlive structure, return a sequence of answers' url."
+  [m]
+  (->> (html/select m [(html/attr= :class "answer-date-link-wrap")])
+       (mapcat :content) (map :attrs) (remove nil?) (map :href)
+       (map #(str "https://www.zhihu.com" %))))
 
 (defn question
-  "Given a question url, return properties."
+  "Given a question url, return enlive structure."
   [url]
-  (-> (client/get url))
-)
+  (utils/url-to-enlive
+   (truss/have #(re-matches #"(http|https)://www.zhihu.com/question/\d{8}" %)
+               url :data "url not valid")))
+
+;; (binding [clj-http.core/*cookie-store* cookie-store]
+;;   (-> (question "https://www.zhihu.com/question/41945693")
+;;       question-answers))

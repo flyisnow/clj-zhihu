@@ -17,7 +17,8 @@
 (ns clj-zhihu.utils
   (:require [clj-http.client :as client]
             [clojure.java.io :as io]
-            [net.cgrand.enlive-html :as html]))
+            [net.cgrand.enlive-html :as html]
+            [clojure.string :as str]))
 
 (def ^:dynamic *headers*
   "headers for posting and getting"
@@ -56,7 +57,7 @@
   "Given a url, return the enlive structure."
   [url]
   {:pre [string? url] :post [(seq? %)]}
-  (-> (client/get "https://www.zhihu.com/question/41068277#answer-31666538")
+  (-> (client/get url)
       :body
       java.io.StringReader.
       html/html-resource))
