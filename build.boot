@@ -1,18 +1,21 @@
 (set-env! :resource-paths #{"resources"}
           :source-paths   #{"src"}
           :dependencies   #(into % '[[org.clojure/clojure "1.8.0"]
-                                       [clj-http "2.1.0"]
-                                       [seesaw "RELEASE"]
-                                       [slingshot "RELEASE"]
-                                       [com.taoensso/truss "RELEASE"]
-                                       ;; [midje "RELEASE"]
-                                       [org.clojure/data.json "RELEASE"]
-                                       [enlive "RELEASE"]
-                                       ;; [zilti/boot-midje "RELEASE"]
-                                       ]))
+                                     [clj-http "2.1.0"]
+                                     [seesaw "RELEASE"]
+                                     [slingshot "RELEASE"]
+                                     [com.taoensso/truss "RELEASE"]
+                                     ;; [midje "RELEASE"]
+                                     [adzerk/bootlaces "0.1.13" :scope "test"]
+                                     [org.clojure/data.json "RELEASE"]
+                                     [enlive "RELEASE"]
+                                     ;; [zilti/boot-midje "RELEASE"]
+                                     ]))
 
+(require '[adzerk.bootlaces :refer :all])
 (def project 'clj_zhihu)
 (def version "0.1.0-SNAPSHOT")
+(bootlaces! version)
 
 (task-options!
  ;; aot {:namespace   #{'clj_project.core}}
@@ -22,9 +25,9 @@
       :url         "https://github.com/lianxiangru/clj-zhihu"
       :scm         {:url "https://github.com/lianxiangru/clj-zhihu"}
       :license     {"GPLv3"
-                    "http://www.gnu.org/licenses/gpl-3.0.en.html"}})
-;; jar {:main        'clj_project.core
-;;   :file        (str "clj_project-" version "-standalone.jar")})
+                    "http://www.gnu.org/licenses/gpl-3.0.en.html"}}
+ jar {:main        'clj_project.core
+      :file        (str "clj_project-" version "-standalone.jar")})
 
 (deftask build
   "Build the project locally as a JAR."
