@@ -41,7 +41,7 @@
   "Download from url to path."
   [url path]
   (with-open [f (io/output-stream (io/file path))]
-    (->> (client/get url {:as :byte-array :headers *headers*})
+    (->> (client/get url {:as :byte-array})
          :body
          (.write f))))
 

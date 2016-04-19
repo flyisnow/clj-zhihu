@@ -21,4 +21,11 @@
             [clojure.java.io :as io]
             [clojure.data.json :as json]
             [net.cgrand.enlive-html :as html]
-            [clj-zhihu.auth :as auth]))
+            [clj-zhihu.auth :as auth]
+            [taoensso.truss :as truss]))
+
+(defn question
+  "Given a question url, return properties."
+  [url]
+  (-> (client/get url))
+)

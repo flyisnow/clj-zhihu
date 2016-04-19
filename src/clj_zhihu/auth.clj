@@ -33,7 +33,7 @@
                {:form-params {:email       ""
                               :password    ""
                               :remember_me true}
-                :headers     utils/*headers*})
+                })
   (utils/download (str "https://www.zhihu.com/captcha.gif?r="
                     (System/currentTimeMillis)
                     "&type=login")
@@ -51,7 +51,7 @@
                                   :remember_me true
                                   :_xsrf       (utils/get-xsrf)
                                   :captcha     (get-login-captcha)}
-                    :headers     utils/*headers*})
+                    })
       (:body)
       (json/read-str)))
 
