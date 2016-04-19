@@ -11,8 +11,8 @@ is a Q&A website in China, and perform various actions.
 * Usage
 
 #+BEGIN_SRC clojure
+(require '[clj_zhihu.core :refer :all])
 ;; To get a cookie-store, use utils/login function
-
 ;; Go with the power of functions!
 (binding [clj-http.core/*cookie-store* cookie-store]
   (-> (question "https://www.zhihu.com/question/41945693")
