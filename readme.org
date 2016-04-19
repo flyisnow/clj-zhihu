@@ -6,7 +6,7 @@ and perform various actions.
 
 * Installation
 
-Available as =[clj_zhihu "0.1.0-SNAPSHOT"]=.
+[[https://img.shields.io/clojars/v/clj_zhihu.svg]]
 
 * Usage
 
