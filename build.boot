@@ -27,7 +27,7 @@
       :license     {"GPLv3"
                     "http://www.gnu.org/licenses/gpl-3.0.en.html"}}
  jar {:main        'clj_project.core
-      :file        (str "clj_project-" version "-standalone.jar")})
+      :file        (str "clj_zhihu-" version "-standalone.jar")})
 
 (deftask build
   "Build the project locally as a JAR."
